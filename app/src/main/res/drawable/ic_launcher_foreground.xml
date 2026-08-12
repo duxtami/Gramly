@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Gramly mark: a minimal balance scale. Authored as a single flat colour on a
+  transparent ground inside the 72dp safe zone, so the same drawable serves as
+  the colour foreground AND the Android 12+ monochrome (themed) layer.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Top pivot knob -->
+    <path
+        android:fillColor="#102000"
+        android:pathData="M54,27 a4,4 0 1,1 0,8 a4,4 0 1,1 0,-8 z" />
+
+    <!-- Central post -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M54,34 L54,74" />
+
+    <!-- Beam -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M32,40 L76,40" />
+
+    <!-- Left hanger strings -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M32,40 L25,52 M32,40 L39,52" />
+
+    <!-- Right hanger strings -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M76,40 L69,52 M76,40 L83,52" />
+
+    <!-- Left pan -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M24,53 Q32,63 40,53" />
+
+    <!-- Right pan -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M68,53 Q76,63 84,53" />
+
+    <!-- Base stand + foot -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#102000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M46,80 L54,74 L62,80 M42,80 L66,80" />
+</vector>

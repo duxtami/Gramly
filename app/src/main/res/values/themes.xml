@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Scale" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Match the Compose surface so there is no white flash on launch or
+             during screen transitions. system_neutral1_10 tracks the dynamic
+             (wallpaper-based) palette on Android 12+. -->
+        <item name="android:windowBackground">@android:color/system_neutral1_10</item>
+    </style>
+</resources>
