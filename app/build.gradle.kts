@@ -30,7 +30,7 @@ android {
     }
 
     signingConfigs {
-        getByName("release") {
+        create("release") {
             if (keystoreProperties.isNotEmpty()) {
                 storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
                 storePassword = keystoreProperties.getProperty("storePassword")
