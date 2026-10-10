@@ -14,13 +14,13 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.ivor.scale"
+    namespace = "duxtami.gramly.app"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.ivor.scale"
+        applicationId = "duxtami.gramly.app"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

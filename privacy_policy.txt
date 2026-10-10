@@ -1,0 +1,65 @@
+Privacy Policy
+Gramly
+Gramly Privacy Policy
+Effective Date: August 12, 2026
+
+This Privacy Policy explains how Gramly ("the App") handles your information and protects your privacy.
+
+Data Collection and Usage
+Gramly is designed to provide calculator and measurement tools directly on your device.
+We value your privacy. The App only accesses the information necessary to provide its core features. All processing happens locally on your device, and we do not collect, sell, rent, or share your personal information.
+
+Information We Access
+We do not require you to create an account, log in, or provide any personal data to use Gramly. Any data generated or calculations performed within the App are strictly for your own use.
+This information is used only to perform calculations and personalize your experience.
+
+Permissions
+Gramly does not request any Android runtime permissions.
+The App does not require access to:
+- Storage
+- Photos or Media
+- Notifications
+- Contacts
+- Microphone
+- Camera
+- Location
+- Bluetooth
+- Phone
+
+Internet Access
+Gramly operates entirely offline. The App does not monitor, collect, or track your internet activity, and no internet connection is required for its core functionality.
+
+Local Data Storage
+The App stores a small amount of data locally on your device, including:
+- App preferences
+- Theme settings
+- Calculation history
+This data never leaves your device and is only removed if you explicitly choose to clear the app's data or uninstall the App.
+
+Third-Party Services
+Gramly operates independently. The App does not include or integrate with:
+- Advertisements
+- Analytics SDKs
+- Tracking services
+- User profiling
+- Background data collection
+
+Data Sharing
+We respect your privacy and do not share your data. Specifically, we do not:
+- Sell your personal data
+- Share your information with advertisers
+- Upload your personal data to any servers
+- Collect unnecessary personal information
+
+Security
+Reasonable measures are taken to protect your information. Because Gramly operates entirely offline, all of your data and calculation history remain securely isolated on your device.
+
+Children's Privacy
+Gramly is not intended for children under the age of 13. We do not knowingly collect personal information from children.
+
+Changes to This Policy
+This Privacy Policy may be updated from time to time. Any changes will be published within the App or on the official project page.
+
+Contact Us
+If you have any questions or concerns regarding this Privacy Policy, please contact:
+Email: amanrajaryan3@gmail.com
