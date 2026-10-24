@@ -19,7 +19,6 @@ class RateWeightSession(val id: Long = System.nanoTime()) {
     var rateGrams by mutableStateOf("")
     var itemName by mutableStateOf("")
     var rateItems by mutableStateOf<List<RateItem>>(emptyList())
-    var customItemName by mutableStateOf("")
     var customItemAmount by mutableStateOf("")
 }
 
@@ -86,11 +85,7 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
         get() = currentSession.itemName
         private set(value) { currentSession.itemName = value }
 
-    // Custom/piece item entry for direct amount or items like oranges, bananas, etc.
-    var customItemName: String
-        get() = currentSession.customItemName
-        private set(value) { currentSession.customItemName = value }
-
+    // Custom direct amount entry (e.g. for oranges, bananas, fixed items)
     var customItemAmount: String
         get() = currentSession.customItemAmount
         private set(value) { currentSession.customItemAmount = value }
@@ -124,7 +119,6 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
     fun onRateKilosChange(v: String) { rateKilos = sanitize(v) }
     fun onRateGramsChange(v: String) { rateGrams = sanitize(v) }
     fun onItemNameChange(v: String) { itemName = v.take(24) }
-    fun onCustomItemNameChange(v: String) { customItemName = v.take(24) }
     fun onCustomItemAmountChange(v: String) { customItemAmount = sanitize(v) }
 
     fun onPieceKnownQtyChange(v: String) { pieceKnownQty = sanitize(v) }
@@ -152,7 +146,6 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
         rateKilos = ""
         rateGrams = ""
         itemName = ""
-        customItemName = ""
         customItemAmount = ""
     }
     fun clearPiece() { pieceKnownQty = ""; pieceKnownPrice = ""; pieceDesiredQty = "" }
@@ -195,7 +188,7 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
             itemName = ""
         }
         if (hasCustom) {
-            val name = customItemName.trim()
+            val name = itemName.trim()
             newItems.add(
                 RateItem(
                     id = System.nanoTime() + 1,
@@ -204,8 +197,8 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
                     amount = customAmt,
                 )
             )
-            customItemName = ""
             customItemAmount = ""
+            itemName = ""
         }
         rateItems = rateItems + newItems
     }

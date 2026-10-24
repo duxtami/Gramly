@@ -103,13 +103,10 @@ fun RateTab(
         onAdd = { vm.addRateItem() },
         addEnabled = (result is CalcResult.Success) || vm.customItemAmount.isNotBlank(),
         belowButtons = {
-            CustomItemSection(
-                name = vm.customItemName,
+            CustomAmountRow(
                 amount = vm.customItemAmount,
-                onNameChange = vm::onCustomItemNameChange,
                 onAmountChange = vm::onCustomItemAmountChange,
                 onAdd = { vm.addCustomRateItem() },
-                canAdd = vm.customItemAmount.isNotBlank() || (result is CalcResult.Success),
             )
 
             if (vm.rateItems.isNotEmpty()) {
@@ -244,74 +241,44 @@ private fun CalculatorScaffold(
 }
 
 /**
- * Card for entering a custom amount (e.g. for bananas, oranges, fixed items) directly into the bill.
+ * Normal row for entering a custom amount (e.g. for bananas, oranges, fixed items) directly into the bill.
  */
 @Composable
-private fun CustomItemSection(
-    name: String,
+private fun CustomAmountRow(
     amount: String,
-    onNameChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
     onAdd: () -> Unit,
-    canAdd: Boolean,
 ) {
     val strings = LocalStrings.current
     val addSource = remember { MutableInteractionSource() }
 
-    Card(
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
+        NumberField(
+            value = amount,
+            onValueChange = onAmountChange,
+            label = strings.fieldCustomAmount,
+            prefix = "₹",
+            imeAction = ImeAction.Done,
+            onImeAction = onAdd,
+            modifier = Modifier.weight(1f),
+        )
+        Button(
+            onClick = onAdd,
+            enabled = amount.isNotBlank(),
+            interactionSource = addSource,
+            shape = MaterialTheme.shapes.large,
+            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .heightIn(min = 56.dp)
+                .expressivePress(addSource),
         ) {
-            Text(
-                text = strings.customItemSectionTitle,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                NameField(
-                    value = name,
-                    onValueChange = onNameChange,
-                    label = strings.fieldCustomName,
-                    imeAction = ImeAction.Next,
-                    modifier = Modifier.weight(1.1f),
-                )
-                NumberField(
-                    value = amount,
-                    onValueChange = onAmountChange,
-                    label = strings.fieldCustomAmount,
-                    prefix = "₹",
-                    imeAction = ImeAction.Done,
-                    onImeAction = onAdd,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            Button(
-                onClick = onAdd,
-                enabled = canAdd,
-                interactionSource = addSource,
-                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .expressivePress(addSource),
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(strings.addCustomItem)
-            }
+            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(strings.add)
         }
     }
 }
