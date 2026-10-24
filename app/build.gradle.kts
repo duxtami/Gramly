@@ -46,8 +46,10 @@ android {
             // and obfuscates. Resource shrinking drops unreferenced resources.
             isMinifyEnabled = true
             isShrinkResources = true
-            if (keystoreProperties.isNotEmpty()) {
-                signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (keystoreProperties.isNotEmpty()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
