@@ -26,3 +26,7 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+
+# Build artifacts
+*.apk
+build-output/
