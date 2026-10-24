@@ -132,7 +132,7 @@ object Calculator {
     /** 20.0 -> "₹20", 20.5 -> "₹20.5", 1234.56 -> "₹1,234.56" (Indian grouping). */
     fun formatRupees(amount: Double): String = "₹" + rupeeFormat.format(amount)
 
-    private fun formatRupeesPlain(amount: Double): String {
+    fun formatRupeesPlain(amount: Double): String {
         val rounded = (amount * 100.0).roundToLong() / 100.0
         return if (rounded == rounded.toLong().toDouble()) {
             rounded.toLong().toString()
