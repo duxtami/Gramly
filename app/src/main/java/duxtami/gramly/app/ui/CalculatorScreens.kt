@@ -1,13 +1,16 @@
 package duxtami.gramly.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -97,18 +101,26 @@ fun RateTab(
         animationsEnabled = animationsEnabled,
         onCopy = onCopy,
         onAdd = { vm.addRateItem() },
-        addEnabled = result is CalcResult.Success,
-        belowButtons = if (vm.rateItems.isNotEmpty()) {
-            {
+        addEnabled = (result is CalcResult.Success) || vm.customItemAmount.isNotBlank(),
+        belowButtons = {
+            CustomItemSection(
+                name = vm.customItemName,
+                amount = vm.customItemAmount,
+                onNameChange = vm::onCustomItemNameChange,
+                onAmountChange = vm::onCustomItemAmountChange,
+                onAdd = { vm.addCustomRateItem() },
+                canAdd = vm.customItemAmount.isNotBlank() || (result is CalcResult.Success),
+            )
+
+            if (vm.rateItems.isNotEmpty()) {
                 RateBillSection(
                     items = vm.rateItems,
                     total = vm.rateItemsTotal,
                     onRemove = vm::removeRateItem,
                     onClearAll = vm::clearRateItems,
+                    onCopy = onCopy,
                 )
             }
-        } else {
-            null
         },
     ) {
         PricePresetRow(
@@ -231,6 +243,79 @@ private fun CalculatorScaffold(
     }
 }
 
+/**
+ * Card for entering a custom amount (e.g. for bananas, oranges, fixed items) directly into the bill.
+ */
+@Composable
+private fun CustomItemSection(
+    name: String,
+    amount: String,
+    onNameChange: (String) -> Unit,
+    onAmountChange: (String) -> Unit,
+    onAdd: () -> Unit,
+    canAdd: Boolean,
+) {
+    val strings = LocalStrings.current
+    val addSource = remember { MutableInteractionSource() }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = strings.customItemSectionTitle,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                NameField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    label = strings.fieldCustomName,
+                    imeAction = ImeAction.Next,
+                    modifier = Modifier.weight(1.1f),
+                )
+                NumberField(
+                    value = amount,
+                    onValueChange = onAmountChange,
+                    label = strings.fieldCustomAmount,
+                    prefix = "₹",
+                    imeAction = ImeAction.Done,
+                    onImeAction = onAdd,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            Button(
+                onClick = onAdd,
+                enabled = canAdd,
+                interactionSource = addSource,
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .expressivePress(addSource),
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(strings.addCustomItem)
+            }
+        }
+    }
+}
+
 /** The running bill: each saved weight→amount line, a grand total, and clear-all. */
 @Composable
 private fun RateBillSection(
@@ -238,6 +323,7 @@ private fun RateBillSection(
     total: Double,
     onRemove: (Long) -> Unit,
     onClearAll: () -> Unit,
+    onCopy: (String) -> Unit,
 ) {
     val strings = LocalStrings.current
     Card(
@@ -251,7 +337,7 @@ private fun RateBillSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -283,14 +369,16 @@ private fun RateBillSection(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
-                            Text(
-                                text = item.weightLabel,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            if (item.weightLabel.isNotBlank()) {
+                                Text(
+                                    text = item.weightLabel,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         } else {
                             Text(
-                                text = item.weightLabel,
+                                text = item.weightLabel.ifBlank { strings.customItemDefaultLabel },
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -318,21 +406,40 @@ private fun RateBillSection(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onCopy(Calculator.formatRupeesPlain(total)) },
             ) {
-                Text(
-                    text = strings.billTotal,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = Calculator.formatRupees(total),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Black,
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column {
+                        Text(
+                            text = strings.billTotal,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                        Text(
+                            text = strings.tapToCopy,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        )
+                    }
+                    Text(
+                        text = Calculator.formatRupees(total),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
             }
         }
     }

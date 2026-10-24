@@ -19,6 +19,8 @@ class RateWeightSession(val id: Long = System.nanoTime()) {
     var rateGrams by mutableStateOf("")
     var itemName by mutableStateOf("")
     var rateItems by mutableStateOf<List<RateItem>>(emptyList())
+    var customItemName by mutableStateOf("")
+    var customItemAmount by mutableStateOf("")
 }
 
 /**
@@ -84,6 +86,15 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
         get() = currentSession.itemName
         private set(value) { currentSession.itemName = value }
 
+    // Custom/piece item entry for direct amount or items like oranges, bananas, etc.
+    var customItemName: String
+        get() = currentSession.customItemName
+        private set(value) { currentSession.customItemName = value }
+
+    var customItemAmount: String
+        get() = currentSession.customItemAmount
+        private set(value) { currentSession.customItemAmount = value }
+
     // Piece calculator — known count + its price, and the count the user wants.
     var pieceKnownQty by mutableStateOf("")
         private set
@@ -113,6 +124,8 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
     fun onRateKilosChange(v: String) { rateKilos = sanitize(v) }
     fun onRateGramsChange(v: String) { rateGrams = sanitize(v) }
     fun onItemNameChange(v: String) { itemName = v.take(24) }
+    fun onCustomItemNameChange(v: String) { customItemName = v.take(24) }
+    fun onCustomItemAmountChange(v: String) { customItemAmount = sanitize(v) }
 
     fun onPieceKnownQtyChange(v: String) { pieceKnownQty = sanitize(v) }
     fun onPieceKnownPriceChange(v: String) { pieceKnownPrice = sanitize(v) }
@@ -135,7 +148,13 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
         get() = Calculator.convertResult(convertQuantity, convertUnit, convertPrice)
 
     fun clearWeightTab() { amount = "" }
-    fun clearRateTab() { rateKilos = ""; rateGrams = ""; itemName = "" }
+    fun clearRateTab() {
+        rateKilos = ""
+        rateGrams = ""
+        itemName = ""
+        customItemName = ""
+        customItemAmount = ""
+    }
     fun clearPiece() { pieceKnownQty = ""; pieceKnownPrice = ""; pieceDesiredQty = "" }
     fun clearConvert() { convertQuantity = ""; convertPrice = "" }
 
@@ -148,23 +167,52 @@ class ScaleViewModel(app: Application) : AndroidViewModel(app) {
     val rateItemsTotal: Double
         get() = rateItems.sumOf { it.amount }
 
-    /** Save the current weight→amount as a bill item, then clear the weight inputs. */
+    /** Save the current weight→amount and/or custom item as bill items, then clear the inputs. */
     fun addRateItem() {
-        val price = Calculator.parse(pricePerKg) ?: return
+        val price = Calculator.parse(pricePerKg)
         val kilos = Calculator.parse(rateKilos) ?: 0.0
         val grams = Calculator.parse(rateGrams) ?: 0.0
         val weightKg = kilos + grams / 1000.0
-        if (weightKg <= 0.0) return
-        val item = RateItem(
-            id = System.nanoTime(),
-            name = itemName.trim(),
-            weightLabel = Calculator.formatWeight(weightKg),
-            amount = price * weightKg,
-        )
-        rateItems = rateItems + item
-        rateKilos = ""
-        rateGrams = ""
-        itemName = ""
+        val hasWeight = price != null && weightKg > 0.0
+
+        val customAmt = Calculator.parse(customItemAmount) ?: 0.0
+        val hasCustom = customAmt > 0.0
+
+        if (!hasWeight && !hasCustom) return
+
+        val newItems = mutableListOf<RateItem>()
+        if (hasWeight) {
+            newItems.add(
+                RateItem(
+                    id = System.nanoTime(),
+                    name = itemName.trim(),
+                    weightLabel = Calculator.formatWeight(weightKg),
+                    amount = price!! * weightKg,
+                )
+            )
+            rateKilos = ""
+            rateGrams = ""
+            itemName = ""
+        }
+        if (hasCustom) {
+            val name = customItemName.trim()
+            newItems.add(
+                RateItem(
+                    id = System.nanoTime() + 1,
+                    name = name,
+                    weightLabel = if (name.isBlank()) "Piece / Extra" else "Piece / Fixed",
+                    amount = customAmt,
+                )
+            )
+            customItemName = ""
+            customItemAmount = ""
+        }
+        rateItems = rateItems + newItems
+    }
+
+    /** Save the custom/piece item (and any pending weight calculation) to the bill. */
+    fun addCustomRateItem() {
+        addRateItem()
     }
 
     fun removeRateItem(id: Long) {
