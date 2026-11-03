@@ -102,7 +102,7 @@ fun RateTab(
         animationsEnabled = animationsEnabled,
         onCopy = onCopy,
         onAdd = { vm.addRateItem() },
-        addEnabled = (result is CalcResult.Success) || vm.customItemAmount.isNotBlank(),
+        addEnabled = result is CalcResult.Success,
         belowButtons = {
             CustomAmountRow(
                 amount = vm.customItemAmount,
@@ -269,7 +269,7 @@ private fun CustomAmountRow(
         )
         Button(
             onClick = onAdd,
-            enabled = amount.isNotBlank(),
+            enabled = amount.isNotBlank() && (Calculator.parse(amount) ?: 0.0) > 0.0,
             interactionSource = addSource,
             shape = MaterialTheme.shapes.large,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
